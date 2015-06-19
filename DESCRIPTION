@@ -1,0 +1,20 @@
+Package: R-npolar
+Title: Npolar API R package
+Version: 1.0.1
+Date: 2015-06-19
+Authors@R: c(person(
+    "Conrad Helgeland", role=c("aut", "cre"), email="conrad@npolar.no")
+    )
+Maintainer: Conrad Helgeland
+Description:
+Imports:
+    httr (>= 0.6.1),
+    jsonlite
+Suggests:
+    testthat,
+    roxygen2
+Depends:
+    R (>= 3),
+License: MIT + file LICENSE
+URL: https://github.com/npolar/R-npolar
+BugReports: https://github.com/npolar/R-npolar/issues
