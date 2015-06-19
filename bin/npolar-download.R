@@ -34,12 +34,27 @@
 # * [jsonlite](https://github.com/jeroenooms/jsonlite) - [The jsonlite Package: A Practical and Consistent Mapping Between JSON Data and R Objects](http://arxiv.org/pdf/1403.2805v1.pdf)
 #
 # Notice: This is an initial draft version
+
+source ("./R/api.R")
+
+api.base <- "https://api.npolar.no"
+
+api.download.fields <- function(path) {
+  fields <- ""
+  if (grepl("/tracking/svalbard-reindeer", path)) {  
+    fields <- "measured,platform,latitude,longitude,altitude,activity_y,activity_x,hdop,temperature,time_to_fix,satellites,comment"
+  }
+  fields
+}
+
+
+
 api.get <- function(uri, headers) {
 
   username <- Sys.getenv("R_NPOLAR_USERNAME")
   password <- Sys.getenv("R_NPOLAR_PASSWORD")
   
-  response <- httr::GET(uri, authenticate(username, password, "basic"))
+  response <- httr::GET(uri, authenticate(username, password, "basic"), timeout(10))
   if (response$status_code > 299) {
     stop(paste("GET request failed with status", response$status_code, "for", uri, "\n", response))
   }
@@ -51,7 +66,7 @@ api.json <- function(uri) {
   jsonlite::fromJSON(json, simplifyVector = FALSE, simplifyDataFrame = FALSE)
 }
 
-count <- function(filename, format) {
+api.download.count <- function(filename, format) {
   
   count <- 0
   if (grepl("csv", format)) {  
@@ -62,7 +77,7 @@ count <- function(filename, format) {
   count 
 }
       
-intervalFacet <- function(feed, term) {
+api.download.intervalFacet <- function(feed, term) {
 
   vector = c()
   for(i in 1:length(feed$facets)){
@@ -82,13 +97,84 @@ intervalFacet <- function(feed, term) {
   vector
 }
 
+api.download <- function(path, destination="./api.npolar.no", format="json", interval="month", intervalField="measured", fields=NULL) {
 
+  # Lookup default fields for this API path
+  if (is.null(fields)) { fields <- api.download.fields(path) }
+
+  if (is.na(destination)) { destination <- "./api.npolar.no" }
+  if (is.na(format)) { format <- "json" }
+  if (is.na(intervalField)) { intervalField <- "measured" }
+  if (is.na(interval)) { interval <- "month" }
+  
+  query <- paste0("?q=&format=json&variant=atom&limit=1&date-",interval,"=",intervalField,"&sort=-",intervalField)
+  uri <- paste0(api.base,path,query)
+
+  message(paste("Starting", format, "download of", path, "interval", interval, intervalField, "to", destination))
+  feed <- api.json(uri)$feed
+
+  message(paste(feed$opensearch$totalResults, "remote documents, most recent", intervalField, "\n", toJSON(feed$entries)))
+
+  j = 0
+  term <- paste0(interval, "-", intervalField)
+
+  facets = api.download.intervalFacet(feed, term)
+  message(paste(length(facets), interval, "intervals using", intervalField, "field"))
+
+  for (facet in facets) {
+    
+    j <- j+1
+    uri <- paste0(facet$uri, "&format=", format, "&sort=", intervalField, "&limit=all")
+    if (FALSE == is.na(fields)) {
+      uri <- paste0(uri, "&fields=", fields)
+    }
+    if (grepl("json", format)) {
+      uri <- paste0(uri, "&variant=", "array")
+    }
+    # Create filename like ./dataset/csv/year-created/2008-dataset.csv
+    dir <- paste0(destination, "/", path, "/", format, "/", term)
+    stem <- gsub("/", "-", gsub("^/", "", path))
+    filename <- paste0(dir, "/", facet$term, "-", stem, "-", "npolar", ".", format)
+    
+    if (FALSE == file.exists(dir)) {
+      dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+    }
+    
+    download <- TRUE
+    if (file.exists(filename)) {
+      if (api.download.count(filename, format) == facet$count) {
+	message(paste("Counts in existing local copy of", facet$term, "matches API", path, "count:", facet$count))
+	download <- FALSE
+      }
+    }
+      
+    if (download == TRUE) {
+      message(paste("Fetching", facet$term, "[", interval, j, "/", length(facets), "] using", uri))
+      
+      body <- api.get(uri)
+      
+      if (grepl("json", format)) { 
+	json <- fromJSON(body)
+	body <- toJSON(json, pretty=TRUE)
+      }
+      message(paste("Saving", filename))
+      cat(body, file=filename)
+      
+      if (api.download.count(filename, format) == facet$count) {
+	message(paste("Counts in fresh local copy of", facet$term, "matches API", path, "count:", facet$count))
+      } else {
+	# noop: Need CSV count to emit proper warning
+      }
+    }
+  }
+
+}
+
+# require
 library(jsonlite)
 library(httr)
 
 args <- commandArgs(TRUE)
-
-base <- "https://api.npolar.no"
 
 path <- args[1]
 destination <- args[2]
@@ -97,69 +183,8 @@ interval <- args[4]
 intervalField <- args[5]
 fields <- args[6]
 
-usage = "Usage:\nRscript npolar-download.R {relative API path} [{destination} {format} {interval} {intervalField}]"
+usage = "Usage:\nRscript[.exe] npolar-download.R {relative API path} [{destination} {format} {interval} {intervalField}]\nExample: Rscript.exe ./bin/npolar-download.R /oceanography/buoy"
+if (is.na(path)) { stop(usage[1]) }
 
-if (is.na(path)) { stop(usage) }
-if (is.na(destination)) { destination <- "./api.npolar.no" }
-if (is.na(format)) { format <- "json" }
-if (is.na(intervalField)) { intervalField <- "measured" }
-if (is.na(interval)) { interval <- "month" }
-
-query <- paste0("?q=&format=json&variant=atom&limit=1&date-",interval,"=",intervalField,"&sort=-",intervalField)
-uri <- paste0(base,path,query)
-
-message(paste("Starting", format, "download of", path, "interval", interval, intervalField, "to", destination))
-feed <- api.json(uri)$feed
-
-message(paste(feed$opensearch$totalResults, "remote documents, most recent", intervalField, "\n", toJSON(feed$entries)))
-
-j = 0
-term <- paste0(interval, "-", intervalField)
-
-facets = intervalFacet(feed, term)
-message(paste(length(facets), interval, "intervals using", intervalField, "field"))
-
-for (facet in facets) {
-  
-  j <- j+1
-  uri <- paste0(facet$uri, "&format=", format, "&sort=", intervalField, "&limit=all")
-  if (FALSE == is.na(fields)) {
-    uri <- paste0(uri, "&fields=", fields)
-  }
-  if (grepl("json", format)) {
-    uri <- paste0(uri, "&variant=", "array")
-  }
-  # Create filename like ./dataset/csv/year-created/2008-dataset.csv
-  dir <- paste0(destination, "/", path, "/", format, "/", term)
-  stem <- gsub("/", "-", gsub("^/", "", path))
-  filename <- paste0(dir, "/", facet$term, "-", stem, "-", "npolar", ".", format)
-  
-  dir.create(dir, showWarnings = FALSE, recursive = TRUE)
-  
-  download <- TRUE
-  if (file.exists(filename)) {
-    if (count(filename, format) == facet$count) {
-      message(paste("Counts in existing local copy of", facet$term, "matches API", path, "count:", facet$count))
-      download <- FALSE
-    }
-  }
-    
-  if (download == TRUE) {
-    message(paste("Fetching", facet$term, "[", interval, j, "/", length(facets), "] using", uri))
-    
-    body <- api.get(uri)
-    
-    if (grepl("json", format)) { 
-      json <- fromJSON(body)
-      body <- toJSON(json, pretty=TRUE)
-    }
-    message(paste("Saving", filename))
-    cat(body, file=filename)
-    
-    if (count(filename, format) == facet$count) {
-      message(paste("Counts in fresh local copy of", facet$term, "matches API", path, "count:", facet$count))
-    } else {
-      # noop: Need CSV count to emit proper warning
-    }
-  }
-}
+#assignInNamespace("api", api, "npolar")
+api.download(path, destination=destination, format=format, interval=interval, intervalField=intervalField, fields=fields)
