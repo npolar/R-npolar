@@ -1,13 +1,12 @@
 api.download.fields <- function(path) {
   fields <- ""
   if (grepl("^/tracking/svalbard-reindeer$", path)) {
-    fields <- "measured,platform,latitude,longitude,altitude,activity_y,activity_x,hdop,temperature,time_to_fix,satellites,comment"
+    fields <- "measured,individual,latitude,longitude,platform,platform_name,altitude,activity_y,activity_x,hdop,temperature,time_to_fix,satellites,comment"
   }
   fields
 }
 
 api.download.count <- function(filename, format) {
-
   count <- 0
   if (grepl("csv", format)) {
     count <- 0 # nrow(read.csv(filename))
@@ -61,11 +60,11 @@ api.download <- function(path, destination="./api.npolar.no", format="json",
   if (is.na(intervalField)) { intervalField <- "measured" }
   if (is.na(interval)) { interval <- "month" }
 
-  query <- paste0("?q=&format=json&variant=atom&limit=1&date-",interval,"=",intervalField,"&sort=-",intervalField)
+  query <- paste0("?q=&format=json&variant=atom&limit=1&size-facet=99999&date-",interval,"=",intervalField,"&sort=-",intervalField)
   uri <- paste0(api.base,path,query)
 
   message(paste("Starting", format, "download of", path, "interval", interval, intervalField, "to", destination))
-  feed <- api.json(uri)$feed
+  feed <- api.get.json(uri)$feed
 
   message(paste(feed$opensearch$totalResults, "remote documents, most recent", intervalField, "\n", toJSON(feed$entries)))
 
@@ -100,13 +99,13 @@ api.download <- function(path, destination="./api.npolar.no", format="json",
 
 
       if (grepl("^json$", format)) {
-        json <- api.json(uri)
+        json <- api.get.json(uri)
 
         if (FALSE == is.null(process)) {
           message(paste("Processing", filename))
           json = process(json)
         }
-        body <- toJSON(json, pretty=TRUE)
+        body <- toJSON(json, pretty=TRUE, auto_unbox=TRUE)
       } else {
         body <- api.get(uri)
       }
