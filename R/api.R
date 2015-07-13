@@ -1,6 +1,8 @@
 library(jsonlite)
 library(httr)
 
+source ("R/api/download.R")
+
 api.base <- "https://api.npolar.no"
 
 # Set username using: Sys.setenv(R_NPOLAR_USERNAME="username")
@@ -19,7 +21,7 @@ api.get <- function(uri, headers) {
 
   if (FALSE == grepl("https?://", uri)) { uri <- paste0(api.base, uri) }
 
-  response <- httr::GET(uri, authenticate(username, password, "basic"), timeout(5))
+  response <- httr::GET(uri, authenticate(username, password, "basic"), timeout(30))
   if (response$status_code > 299) {
     stop(paste("GET request failed with status", response$status_code, "for", uri, "\n", response))
   }
