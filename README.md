@@ -1,7 +1,5 @@
 # R-npolar
-[R](http://www.r-project.org/)-package* for interacting with the [Norwegian Polar Institute's REST API](https://api.npolar.no)s.
-
-* to-be
+[R](http://www.r-project.org/)-package(-to-be) for interacting with the [Norwegian Polar Institute's REST API](https://api.npolar.no)s.
 
 ## api.download
 
