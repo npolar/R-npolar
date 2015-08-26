@@ -2,7 +2,11 @@ api.download.fields <- function(path) {
   fields <- NULL
   if (grepl("^/tracking/svalbard-reindeer$", path)) {
     fields <- "measured,individual,latitude,longitude,platform,platform_name,altitude,activity_y,activity_x,hdop,temperature,time_to_fix,satellites,comment"
+  } else if (grepl("^/tracking/svalbard-rock-ptarmigan$", path)) {
+    # "_id,_rev,altitude,base,bundle,collection,created,created_by,decoder,deployed,deployment,file,headers,id,identical,individual,latitude,lc,lines,longitude,measured,message_type,object,parser,platform,platform_model,platform_type,positioned,program,satellite,sensor_data,sensor_variables,sensors,source,species,technology,temperature,terminated,type,updated,updated_by,voltage"
+    fields <- "altitude,deployed,deployment,headers,identical,individual,latitude,lc,lines,longitude,measured,message_type,platform,platform_model,platform_type,positioned,program,satellite,sensor_data,sensor_variables,sensors,source,technology,temperature,terminated,type,voltage"
   }
+  message(paste("Fields", fields, "for path", path))
   fields
 }
 
