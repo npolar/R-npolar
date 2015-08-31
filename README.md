@@ -10,9 +10,12 @@ source('/path/to/R-npolar/R/api.R')
 ```
 
 ### Authentication
-Set the following environmental variables
+Set the following environmental variables in your host operating system, or in you [`.Rprofile`](). 
+
+```
 * `R_NPOLAR_USERNAME`
 * `R_NPOLAR_PASSWORD`
+```
 
 ### api.download
 This function is a mirroring utility intended to keep a local copy in sync with a remote Npolar [API](https://api.npolar.no).
