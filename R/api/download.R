@@ -1,3 +1,4 @@
+# @return Fields (keys) to include
 api.download.fields <- function(path) {
   fields <- NULL
   if (grepl("^/tracking/svalbard-reindeer$", path)) {
@@ -10,7 +11,8 @@ api.download.fields <- function(path) {
   fields
 }
 
-api.download.count <- function(filename, format) {
+# @return 
+api.download.countLocalDocuments <- function(filename, format) {
   count <- 0
   if (grepl("^csv$", format)) {
 
@@ -85,7 +87,7 @@ api.download.filename <- function(destination=NULL, path=NULL, format=NULL, inte
 #' Saving ./api.npolar.no//oceanography/buoy/json/month-measured/2015-01-oceanography-buoy-npolar.json
 #' [...]
 #' @export
-api.download <- function(path, destination="./api.npolar.no", format="json",
+api.download <- function(path, destination="./api.npolar.no-export", format="json",
    interval="month", intervalField="measured", fields=NULL, process=NULL) {
 
   # Lookup default fields for this API path
@@ -151,7 +153,7 @@ api.download <- function(path, destination="./api.npolar.no", format="json",
 
     # Set download to FALSE if local count == facet count
     if (file.exists(filename)) {
-      if (api.download.count(filename, format) == facet$count) {
+      if (api.download.countLocalDocuments(filename, format) == facet$count) {
         message(paste("Existing local", format, "file for", facet$term, "matches API", path, "count:", facet$count))
         download <- FALSE
         localCount = localCount + api.download.count(filename, format)
