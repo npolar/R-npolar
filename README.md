@@ -13,8 +13,8 @@ source('/path/to/R-npolar/R/api.R')
 Set the following environmental variables in your host operating system, or in you [`.Rprofile`](). 
 
 ```
-`R_NPOLAR_USERNAME`
-`R_NPOLAR_PASSWORD`
+R_NPOLAR_USERNAME
+R_NPOLAR_PASSWORD
 ```
 
 ### api.download
