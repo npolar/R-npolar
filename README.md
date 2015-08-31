@@ -11,12 +11,13 @@ source('/path/to/R-npolar/R/api.R')
 
 ### Authentication
 Set the following environmental variables
-* R_NPOLAR_USERNAME
-* R_NPOLAR_PASSWORD
+* `R_NPOLAR_USERNAME`
+* `R_NPOLAR_PASSWORD`
 
 ### api.download
 This function is a mirroring utility intended to keep a local copy in sync with a remote Npolar [API](https://api.npolar.no).
-Only periods missing in the local copy will be downloaded. The local mirror consists of one file per period of a given interval (1 month is the default).
+Only periods missing in the local copy will be downloaded. The local mirror consists of one file in the specified format per month. 
+Supprted formats include JSON, GeoJSON, and CSV (tab-separated).
 
 ```http
 > api.download("/oceanography/buoy", format="geojson")
