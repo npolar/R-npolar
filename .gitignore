@@ -12,6 +12,6 @@
 vignettes/*.html
 vignettes/*.pdf
 .Rproj.user
-api.npolar.no
+api.npolar.no*
 .RData
 .Rbuildignore
