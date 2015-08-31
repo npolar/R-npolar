@@ -35,9 +35,13 @@ api.get.json <- function(uri) {
   jsonlite::fromJSON(json, simplifyVector = FALSE, simplifyDataFrame = FALSE)
 }
 
+# @todo Integrity checksum using revisions (or other key found in all documents)
 # Given uri for a month like
 # "https://api.npolar.no/oceanography/buoy?limit=1&size-facet=99999&variant=atom&q=&format=json&date-month=measured&sort=-measured&filter-measured=2015-05-01T00:00:00Z..2015-06-01T00:00:00Z&sort=measured&limit=all&fields=id,_rev&variant=array"
 # irb(main):018:0> Digest::SHA1.hexdigest JSON.parse(open(uri).read).map {|d| d["_rev"] }.join
-#=> "14362d57dad7f5bf473802020e1438349e049db6"
-#http://r-pkgs.had.co.nz/namespace.html
-
+# => "14362d57dad7f5bf473802020e1438349e049db6"
+#
+# @todo Add "npolar" as namespace
+# http://r-pkgs.had.co.nz/namespace.html
+#
+# @todo Proper (installable) R-package
