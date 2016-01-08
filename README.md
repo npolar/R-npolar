@@ -6,11 +6,12 @@
 ```R
 install.packages("jsonlite")
 install.packages("httr")
-source('/path/to/R-npolar/R/api.R') 
+source('/path/to/R-npolar/R/api.R')
+source('/path/to/R-npolar/R/api/download.R') 
 ```
 
 ### Authentication
-Set the following environmental variables in your host operating system, or in you [`.Rprofile`](). 
+Set the following environmental variables in your host operating system, or in you `.Rprofile`. 
 
 ```
 R_NPOLAR_USERNAME
@@ -22,6 +23,7 @@ This function is a mirroring utility intended to keep a local copy in sync with 
 Only periods missing in the local copy will be downloaded. The local mirror consists of one file in the specified format per month. 
 Supprted formats include JSON, GeoJSON, and CSV (tab-separated).
 
+Example:
 ```http
 > api.download("/oceanography/buoy", format="geojson")
 Starting geojson download of /oceanography/buoy interval month measured to ./api.npolar.no
