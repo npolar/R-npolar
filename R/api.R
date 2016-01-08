@@ -1,8 +1,6 @@
 library(jsonlite)
 library(httr)
 
-source ("R/api/download.R")
-
 api.base <- "https://api.npolar.no"
 
 # Set username/password using the following [environmental variables]():
