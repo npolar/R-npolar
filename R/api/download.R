@@ -156,7 +156,7 @@ api.download <- function(path, destination="./api.npolar.no-export", format="jso
       if (api.download.countLocalDocuments(filename, format) == facet$count) {
         message(paste("Existing local", format, "file for", facet$term, "matches API", path, "count:", facet$count))
         download <- FALSE
-        localCount = localCount + api.download.count(filename, format)
+        localCount = localCount + api.download.countLocalDocuments(filename, format)
       }
     }
 
@@ -179,9 +179,9 @@ api.download <- function(path, destination="./api.npolar.no-export", format="jso
 
       cat(body, file=filename)
 
-      if (api.download.count(filename, format) == facet$count) {
+      if (api.download.countLocalDocuments(filename, format) == facet$count) {
         message(paste("Counts in fresh", format, "local copy of", facet$term, "matches API", path, "count:", facet$count))
-        localCount = localCount + api.download.count(filename, format)
+        localCount = localCount + api.download.countLocalDocuments(filename, format)
 
       } else {
         # noop: Need CSV count to emit proper warning
