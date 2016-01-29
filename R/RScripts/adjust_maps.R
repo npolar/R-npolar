@@ -1,8 +1,8 @@
-# This script takes two raster images, one c smaller than the other s.
-# C is padded so that each pixel represent the same distance and then 
-# enlaged so it fits s in size.
-# The two are the stacked on top of each other and displayed both as 
-# separate layers and as a sinle image.
+# This script takes two raster images, where C is smaller than S.
+# C is padded so that each pixel represent the same distance in meters 
+# and afterwards enlaged to fit S in size.
+# The two are then stacked on top of each other and displayed both as 
+# separate layers and as a single image.
 
 
 # load libraries
