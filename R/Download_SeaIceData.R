@@ -12,7 +12,7 @@
 #   date.end          must be of the following format "YYYY-mm-dd"
 #   date.interval     data will be downloaded at this interval from date.start to date.end
 #   hemis             "n" for Northern, "s" for Southern
-#   date.list        if working with a specific list of dates, enter them as a list
+#   date.list         if working with a specific list of dates
 
 dwnld.iceData <- function(output.dir, hemis = "n", date.start, date.end, date.interval = 3, date.list = NULL){
   
