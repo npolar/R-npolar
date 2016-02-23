@@ -12,7 +12,7 @@
 #   date.end          must be of the following format "YYYY-mm-dd"
 #   date.interval     data will be downloaded at this interval from date.start to date.end
 #   hemis             "n" for Northern, "s" for Southern
-#   dater.list        if working with a specific list of dates, enter them as a list
+#   date.list        if working with a specific list of dates, enter them as a list
 
 dwnld.iceData <- function(output.dir, hemis = "n", date.start, date.end, date.interval = 3, date.list = NULL){
   
@@ -27,7 +27,7 @@ dwnld.iceData <- function(output.dir, hemis = "n", date.start, date.end, date.in
   if (is.null(date.list)) {
       date.start <- as.POSIXct(strptime(date.start,"%Y-%m-%d"), "GMT")
       date.end   <- as.POSIXct(strptime(date.end,"%Y-%m-%d"), "GMT")
-      dates      <- format(seq(date.start, date.end, by= 86400*3),"%Y%m%d")
+      dates      <- format(seq(date.start, date.end, by= 86400 * date.interval),"%Y%m%d")
     } else {
       dates  <- format(strptime(date.list, "%Y-%m-%d"), "%Y%m%d")
     }
