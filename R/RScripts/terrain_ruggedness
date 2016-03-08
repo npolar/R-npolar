@@ -17,8 +17,8 @@
 # Unpack – change catalogue name to SAGA-GIS. Move the directory to
 # <your lib dir under R library\RSAGA\>
 
-library(«raster»)
-install.packages(“RSAGA",”<your lib dir under r library>”)
+library("raster")
+install.packages("RSAGA","<your lib dir under r library>")
 
 #import raster image and convert to .sgrd
 #RSAGA will accept only grid formats for processing..(aka .sgrd)
@@ -35,12 +35,12 @@ rsaga.grid.calculus("slope.sgrd","z.sgrd", "cos(a)")
 rsaga.grid.calculus("slope.sgrd","xy.sgrd", "sin(a)")
 
 #Calculate aspect part of x,y from aspect
-rsaga.grid.calculus("aspect.sgrd","x2.sgrd", "cos(a)")
-rsaga.grid.calculus("aspect.sgrd","y2.sgrd", "sin(a)")
+rsaga.grid.calculus("aspect.sgrd","x2.sgrd", "sin(a)")
+rsaga.grid.calculus("aspect.sgrd","y2.sgrd", "cos(a)")
 
 #Calculate x,y
-rsaga.grid.calculus("y2.sgrd","y.sgrd", "a*a")
-rsaga.grid.calculus("x2.sgrd","x.sgrd", "a*a")
+rsaga.grid.calculus(c("xy.sgrd","y2.sgrd"),"y.sgrd", "a*b")
+rsaga.grid.calculus("xy.sgrd","x2.sgrd","x.sgrd", "a*b")
 
 #Must convert to asci grid first to make focal work
 rsaga.sgrd.to.esri("x.sgrd","x_esri.asc", format = "ascii")
@@ -50,12 +50,12 @@ rsaga.sgrd.to.esri("z.sgrd","z_esri.asc", format = "ascii")
 
 #Get 3x3 grid sums from x.sgrd,y.sgrd,z.sgrd
 #Must check – does this function gives what we want? Is radius 1 or 3?
-gapply("x_esri.asc", "x9esri.asc", fun="sum", radius=3)
-gapply("y_esri.asc", "y9esri.asc", fun="sum", radius=3)
-gapply("z_esri.asc", "z9esri.asc", fun="sum", radius=3)
+gapply("x_esri.asc", "x9esri.asc", fun="sum", radius=1, search-mode="square")
+gapply("y_esri.asc", "y9esri.asc", fun="sum", radius=1, search-mode="square")
+gapply("z_esri.asc", "z9esri.asc", fun="sum", radius=1, search-mode="square")
 
 #Alternative to gapply..
-#focal.function("x.sgrd", "x9esri.asc", “fun="sum”)
+#focal.function("x.sgrd", "x9esri.asc", fun="sum")
 #focal.function("y.sgrd", "y9esri.asc", fun="sum")
 #focal.function("z.sgrd", "z9esri.asc", fun="sum")
 
