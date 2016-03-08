@@ -40,7 +40,7 @@ rsaga.grid.calculus("aspect.sgrd","y2.sgrd", "cos(a)")
 
 #Calculate x,y
 rsaga.grid.calculus(c("xy.sgrd","y2.sgrd"),"y.sgrd", "a*b")
-rsaga.grid.calculus("xy.sgrd","x2.sgrd","x.sgrd", "a*b")
+rsaga.grid.calculus(c("xy.sgrd","x2.sgrd"),"x.sgrd", "a*b")
 
 #Must convert to asci grid first to make focal work
 rsaga.sgrd.to.esri("x.sgrd","x_esri.asc", format = "ascii")
