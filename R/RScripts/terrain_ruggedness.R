@@ -13,10 +13,12 @@
 # only convert a filename <filname.ext> to <filename.sgrd>, ex. file.jpg to file.sgrd.
 # Alternatively define your own inputfilesgrd, and turn the gsub command into a comment..
 #
-# Run: inputfile <- "<filename of your terrain model>"
-#      source("terrain_ruggedness")
+# Run windows: inputfile <- "<filename of your terrain model>"
+#              source("terrain_ruggedness")
 #
-# Author: srldl
+# Result:      File is converted to geoTIFF via ESRI ascii format.
+#
+# Author:      srldl
 #
 #####################################################
 
@@ -31,6 +33,8 @@
 #install.packages("RSAGA","<your lib dir under r library>")
 library("raster")
 library("RSAGA")
+#gdalUtils convert esri arcii format to geoTIFF
+library("gdalUtils")
 
 
 #import raster image and convert to .sgrd
@@ -93,3 +97,7 @@ rsaga.grid.calculus("res_sum.sgrd","r.sgrd", "sqrt(a)")
 
 #Finally 1 –(|r|/n)
 rsaga.grid.calculus("r.sgrd","out.sgrd", "1-(a/9)")
+
+#Convert to TIFF file via ESRI ascii format
+rsaga.sgrd.to.esri("out.sgrd","out.asc", format = "ascii")
+gdal_translate('out.asc','out.tif',of="GTiff",output_raster=TRUE,verbose=TRUE)
